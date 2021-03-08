@@ -12,9 +12,7 @@ import resolvers from "./resolvers";
 
 dotenv.config();
 
-const APP_HOST = "localhost";
-const PORT = 5001;
-const APP_URL = `${APP_HOST}:${PORT}`;
+const API_URL = `${process.env.API_HOST}:${process.env.API_PORT}`;
 
 export interface IApolloExpressContext {
   req: Request & { userId?: string };
@@ -44,7 +42,7 @@ function authMiddleware() {
 }
 
 const corsOptions = {
-  origin: "http://localhost:5002",
+  origin: "http://localhost:4488",
   credentials: true,
 };
 
@@ -78,12 +76,12 @@ app.get("/", (req, res) => {
 });
 
 (async () => {
-  httpServer.listen(PORT, () => {
+  httpServer.listen(process.env.API_PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`🚀 Server ready at http://${APP_URL}${server.graphqlPath}`);
+    console.log(`🚀 Server ready at http://${API_URL}${server.graphqlPath}`);
     // eslint-disable-next-line no-console
     console.log(
-      `🚀 Subscriptions ready at ws://${APP_URL}${server.subscriptionsPath}`
+      `🚀 Subscriptions ready at ws://${API_URL}${server.subscriptionsPath}`
     );
   });
 })();

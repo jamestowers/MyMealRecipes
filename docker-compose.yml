@@ -1,0 +1,55 @@
+# Code pinched from https://github.com/rgaino/docker-node-react-mysql-boilerplate
+version: "3"
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: "123123123123"
+      MYSQL_ROOT_PASSWORD: "123123123123"
+      MYSQL_DATABASE: starter_project
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - api-network
+
+  # api:
+  #   build:
+  #     context: ./api
+  #     dockerfile: Dockerfile
+  #   restart: on-failure
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "5001:5001"
+  #   expose:
+  #     - "5001"
+  #   environment:
+  #     NODE_ENV: development
+  #     PORT: 5001
+  #     DB_HOSTNAME: db
+  #     DB_PORT: 3306
+  #     DB_USERNAME: james
+  #     DB_PASSWORD: "123123123123"
+  #     DB_DATABASE: starter_project
+  #   volumes:
+  #     - ./api:/opt/app:delegated
+  #     - ./api/package.json:/opt/package.json
+  #     - ./api/package-lock.json:/opt/package-lock.json
+  #     - notused:/opt/app/node_modules
+  #   networks:
+  #     - api-network
+  #   command: sh -c "./wait-for.sh db:3306 -- npm run build"
+
+volumes:
+  db_data:
+  notused:
+
+networks:
+  api-network:
+    driver: bridge

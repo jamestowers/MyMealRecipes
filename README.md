@@ -1,4 +1,4 @@
-# Choose My Recipes
+# MyMeal.recipes
 
 ## Description
 

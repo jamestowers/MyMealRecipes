@@ -21,8 +21,9 @@ function generateConnectAndCreateArrays<Obj extends {}>(array: (connectIds | Obj
   }, [[], []]);
 }
 
-const isNewIngredient = (ingredient: String | Prisma.IngredientCreateWithoutRecipesInput): ingredient is db.IngredientCreateWithoutRecipesInput => typeof ingredient === "string"
+const isNewIngredient = (ingredient: String | Prisma.IngredientCreateWithoutRecipesInput): ingredient is Prisma.IngredientCreateWithoutRecipesInput => typeof ingredient === "string"
 
+// @ts-expect-error // FIXME: np idea what the problem is yet
 export const resolvers: IResolvers = {
   Query: {
     recipes: async (parent, args, { db }) => await db.recipe.findMany({

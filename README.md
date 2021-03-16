@@ -59,3 +59,7 @@ Start the database
 
 ## TODO:
 - Set up auth: [Passwordless Authentication and Authorization](https://www.prisma.io/blog/backend-prisma-typescript-orm-with-postgresql-auth-mngp1ps7kip4)
+
+
+## Domain
+mymeal.recipes on porkbun.com

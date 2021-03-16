@@ -12,13 +12,15 @@ We also often end up with surplus ingredients because, for example, courgettes c
   -  Title
   -  Recipe link / location (ie. book)
   -  Ingredients list (with autocomplete when adding editing meals)
-  -  Child friendly boolean
+  -  Is Child friendly?
+  -  Is Veggie
   -  Approx. cooking time
 - [ ] Select a recipe at random
 - [ ] Select a recipe based on ingredients
 
 ## Stage 2
 - User accounts
+- Track choices and improve suggestions
 
 ## Stage 3
 - React Native app

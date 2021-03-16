@@ -12,48 +12,58 @@ generator client {
   previewFeatures = ["nativeTypes"]
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  slackId   String?  @unique
-  email     String?  @unique
-  timezone  String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Recipe {
+  id              String   @id @default(uuid())
+  title           String
+  description     String?  @db.VarChar(1000)
+  isChildFriendly Boolean?
+  isVeggie        Boolean?
+  cookingTime     Int?
+  difficulty      Int?
 
-  Token Token[]
-  Post  Post[]
+  ingredients Ingredient[]
+
 }
 
-model Token {
-  createdAt DateTime  @default(now())
-  expiresAt DateTime?
-  token     String    @id
-  updatedAt DateTime  @default(now())
-  userId    Int?
-  user      User?     @relation(fields: [userId], references: [id])
+enum Preferences {
+  VEGGIE
+  GLUTEN_FREE
 }
 
-model Post {
-  id          Int       @id @default(autoincrement())
-  title       String
-  body        String?   @db.VarChar(1000)
-  image       String?
-  publishedAt DateTime?
-  authorId    Int
-
-  author         User          @relation(fields: [authorId], references: [id])
-  PostCategory   PostCategory? @relation(fields: [postCategoryId], references: [id])
-  postCategoryId Int?
+enum IngredientCategory {
+  VEG
+  FRUIT
+  MEAT
+  DAIRY
+  EGG
+  CHEESE
+  CEREAL
+  SUGAR
+  HERB
+  SPICE
+  CONDIMENT
+  OIL
+  FAT
 }
 
-model PostCategory {
-  id       Int    @id @default(autoincrement())
-  title    String @unique
-  parentId Int?
+enum IngredientSubCategory {
+  VEG_SALAD
+  VEG_ROOT
+  MEAT_BEEF
+  MEAT_LAMB
+  MEAT_PORK
+  MEAT_POULTRY
+  MEAT_FISH
+  NUT
+  PASTA
+  RICE
+}
 
-  parent       PostCategory?  @relation(fields: [parentId], references: [id])
-  post         Post[]
-  PostCategory PostCategory[] @relation("PostCategoryToPostCategory")
+model Ingredient {
+  id       String                 @id @default(uuid())
+  name     String                 @unique
+  category IngredientCategory
+  type     IngredientSubCategory?
+
+  recipes Recipe[]
 }

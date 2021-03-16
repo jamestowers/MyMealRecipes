@@ -1,6 +1,5 @@
-import { authenticateUser, authorizeUser } from "../controllers/auth";
-
 import { IApolloExpressContext } from "../";
+import { Prisma } from '../db';
 
 type ResolverFn = (parent: any, args: any, ctx: IApolloExpressContext) => any;
 interface ResolverMap {
@@ -10,61 +9,76 @@ interface ResolverMap {
 interface IResolvers {
   Query: ResolverMap;
   Mutation: ResolverMap;
-  User: ResolverMap;
+  Recipe: ResolverMap;
+  Ingredient: ResolverMap;
 }
+
+type connectIds = { id: string };
+
+function generateConnectAndCreateArrays<Obj extends {}>(array: (connectIds | Obj)[]) {
+  return array.reduce<(connectIds | Obj)[][]>(([connectArr, newArr], item) => {
+    return typeof item === "string" ? [[...connectArr, { id: item }], newArr] : [connectArr, [...newArr, item]];
+  }, [[], []]);
+}
+
+const isNewIngredient = (ingredient: String | Prisma.IngredientCreateWithoutRecipesInput): ingredient is db.IngredientCreateWithoutRecipesInput => typeof ingredient === "string"
 
 export const resolvers: IResolvers = {
   Query: {
-    authorizeUser: async (root, args, { req }) =>
-      await authorizeUser(req.cookies.token),
-    signOut: (root, args, { res }) =>
-      // TODO: Expire token
-      res.clearCookie("token"),
-    userByEmail: async (parent, args, { db }) =>
-      await db.user.findFirst({
+    recipes: async (parent, args, { db }) => await db.recipe.findMany({
+      include: {
+        ingredients: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+      },
+    }),
+    recipe: async (parent, args, { db }) =>
+      await db.recipe.findUnique({
         where: {
-          email: args.email,
+          id: args.id,
+        },
+        include: {
+          ingredients: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
         },
       }),
-    getOrCreateUser: async (parent, args, { db }) => {
-      const existingUser = await db.user.findFirst({
-        where: {
-          email: args.data.email,
-        },
-      });
-      if (existingUser) return existingUser;
-      return await db.user.create({
-        data: args.data,
-      });
-    },
-    users: async (parent, args, { db }) => await db.user.findMany(),
-    user: async (parent, args, { db }) =>
-      await db.user.findFirst({
+    ingredients: async (parent, args, { db }) => await db.ingredient.findMany(),
+    ingredient: async (parent, args, { db }) =>
+      await db.ingredient.findUnique({
         where: {
           id: args.id,
         },
       }),
   },
   Mutation: {
-    authenticateUser: async (parent, args, { db, res }) => {
-      const { token, user } = await authenticateUser(args.code);
+    createRecipe: async (parent, args, { db }) => {
+      const { ingredients, ...recipe } = args.data
 
-      res.cookie("token", token, { httpOnly: true });
-      return user;
+      const [existing, newIngredients] = generateConnectAndCreateArrays(ingredients);
+      return await db.recipe.create({
+        data: {
+          ...recipe,
+          ingredients: {
+            connect: existing,
+            create: newIngredients
+          }
+        },
+      })
     },
-    createUser: async (parent, args, { db }) =>
-      await db.user.create({
+    createIngredient: async (parent, args, { db }) =>
+      await db.ingredient.create({
         data: {
           ...args.data,
         },
       })
   },
-  /* User: {
-    profile: async (parent, args, { db }) =>
-      await db.profile.findFirst({
-        where: { userId: parent.id },
-      }),
-  }, */
 };
 
 export default resolvers;

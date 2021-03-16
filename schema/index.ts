@@ -1,50 +1,82 @@
 import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
-  type User {
-    id: ID!
-    email: String!
+  enum IngredientCategory {
+    VEG,
+    FRUIT,
+    MEAT,
+    DAIRY,
+    EGG,
+    CHEESE,
+    CEREAL,
+    SUGAR,
+    HERB,
+    SPICE,
+    CONDIMENT,
+    OIL,
+    FAT
   }
 
-  type Post {
-    id: ID!
-    title: String!
-    body: String!
-    image: String
-    publishedAt: String
-    author: User
+  enum IngredientSubCategory {
+    VEG_SALAD,
+    VEG_ROOT,
+    MEAT_BEEF,
+    MEAT_LAMB,
+    MEAT_PORK,
+    MEAT_POULTRY,
+    MEAT_FISH,
+    NUT,
+    PASTA,
+    RICE
   }
 
-  type Category {
+  type Recipe {
     id: ID!
     title: String!
-    parent: Category
+    description: String
+    isChildFriendly: Boolean
+    isVeggie: Boolean
+    cookingTime: Int
+    difficulty: Int
+    ingredients: [Ingredient]
+  }
+
+  type Ingredient {
+    id:       ID!
+    name:     String!
+    category: IngredientCategory!
+    type:     IngredientSubCategory
+
+    recipes: [Recipe]
   }
 
   type Query {
-    authorizeUser: User
-    signOut: Boolean
-    users: [User!]!
-    user(id: ID!): User
-    userByEmail(email: String!): User
-    getOrCreateUser(data: GetOrCreateUserInput!): User
+    recipes: [Recipe]
+    recipe(id: ID!): Recipe
+    ingredients: [Ingredient]
+    ingredient(id: ID!): Ingredient
   }
 
   type Mutation {
-    authenticateUser(code: String!): User
-    createUser(data: UserCreateInput!): User!
+    createRecipe(data: RecipeCreateInput!): Recipe!
+    createIngredient(data: IngredientCreateInput!): Ingredient!
   }
 
-  input GetOrCreateUserInput {
-    email: String!
-    name: String
+  input RecipeCreateInput {
+    title: String!
+    description: String
+    isChildFriendly: Boolean
+    isVeggie: Boolean
+    cookingTime: Int
+    difficulty: Int
+    ingredients: [ID!]
   }
 
-  input UserCreateInput {
-    email: String!
-    name: String
+  input IngredientCreateInput {
+    name: String!
+    category: IngredientCategory!
+    type: IngredientSubCategory
   }
-
 `;
 
 export default typeDefs;

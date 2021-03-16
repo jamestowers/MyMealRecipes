@@ -15,13 +15,13 @@ interface IResolvers {
 
 type connectIds = { id: string };
 
-function generateConnectAndCreateArrays<Obj extends {}>(array: (connectIds | Obj)[]) {
+/* function generateConnectAndCreateArrays<Obj extends {}>(array: (connectIds | Obj)[]) {
   return array.reduce<(connectIds | Obj)[][]>(([connectArr, newArr], item) => {
     return typeof item === "string" ? [[...connectArr, { id: item }], newArr] : [connectArr, [...newArr, item]];
   }, [[], []]);
 }
 
-const isNewIngredient = (ingredient: String | Prisma.IngredientCreateWithoutRecipesInput): ingredient is Prisma.IngredientCreateWithoutRecipesInput => typeof ingredient === "string"
+const isNewIngredient = (ingredient: String | Prisma.IngredientCreateWithoutRecipesInput): ingredient is Prisma.IngredientCreateWithoutRecipesInput => typeof ingredient === "string" */
 
 // @ts-expect-error // FIXME: np idea what the problem is yet
 export const resolvers: IResolvers = {
@@ -62,13 +62,11 @@ export const resolvers: IResolvers = {
     createRecipe: async (parent, args, { db }) => {
       const { ingredients, ...recipe } = args.data
 
-      const [existing, newIngredients] = generateConnectAndCreateArrays(ingredients);
       return await db.recipe.create({
         data: {
           ...recipe,
           ingredients: {
-            connect: existing,
-            create: newIngredients
+            connect: ingredients.map((id: string) => ({ id }))
           }
         },
       })
